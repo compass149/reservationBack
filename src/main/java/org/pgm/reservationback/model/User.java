@@ -31,7 +31,7 @@ public class User {
     private Role role;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Gender gender;
 
     @Column(length = 20)
@@ -46,6 +46,12 @@ public class User {
 
     @Column(name = "updatedAt", nullable = false)
     private LocalDateTime updatedAt;
+    @PrePersist
+    public void prePersist() {
+        if (updatedAt == null) {
+            updatedAt = LocalDateTime.now(); // 현재 날짜와 시간으로 설정
+        }
+    }
 
     public enum Gender {
         남, 여    }

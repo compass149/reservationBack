@@ -29,14 +29,13 @@ public class Rooms {
     @Column(name = "description", length = 255)
     private String description;
 
-    /** 방 타입 (성별로 구분) **/
-    @Enumerated(EnumType.STRING)
-    @Column(name = "room_type", nullable = false)
-    private RoomType roomType;
-
     /** 수용 인원 **/
     @Column(name = "capacity", nullable = false)
     private int capacity;
+
+    /** 가격 **/
+    @Column(nullable = false)
+    private Double pricePerNight;
 
     /** 방 생성 시간 **/
     @Column(name = "created_at", nullable = false, updatable = false)

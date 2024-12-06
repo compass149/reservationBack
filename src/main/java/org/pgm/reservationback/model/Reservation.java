@@ -11,11 +11,11 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "reserve")
+@Table(name = "reservation")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Reserve {
+public class Reservation {
 
     /** 예약 고유 ID (PK) **/
     @Id
@@ -31,6 +31,14 @@ public class Reserve {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", referencedColumnName = "rid", nullable = false)
     private Rooms rooms;
+    /**사람 수*/
+    @Column(nullable = false)
+    private Integer totalUser;
+
+    /** 예약 상태 **/
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Status status = Status.대기;
 
     /** 체크인 날짜 **/
     @Column(name = "check_in", nullable = false)
@@ -40,10 +48,6 @@ public class Reserve {
     @Column(name = "check_out", nullable = false)
     private LocalDate checkOut;
 
-    /** 예약 상태 **/
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private Status status;
 
     /** 예약 생성 시간 **/
     @Column(name = "created_at", nullable = false, updatable = false)
