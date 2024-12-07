@@ -5,19 +5,31 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReservationDTO {  //여기에 있는 것을 react랑 연결할 때 구매한 것을 여기에 있는 것으로 사용할 예정
+public class ReservationDTO {
     private Long id;
-    private String username;
-    private Long roomId; //상품 선택할 때 자동으로 roomId가 들어가게 할 예정임
-    /**인원 수**/
-    private Integer totalUser;
-    private LocalDateTime reserveTime; //입출력 시 하나는 enttity, 하나는 dto 사용해도 됨
-//form에서 입력받는 것과 db에 저장되는 것이 다르면 반드시 dto가 필요함
 
+    /** 예약한 사용자 */
+    private String username;
+
+    /** 방 ID (자동으로 선택됨) */
+    private Long roomId;
+
+    /** 예약 인원 수 */
+    private Integer totalUser;
+
+    /** 예약 생성 시간 */
+    private LocalDateTime reserveTime;
+
+    /** 체크인 날짜 */
+    private LocalDate checkIn;
+
+    /** 체크아웃 날짜 */
+    private LocalDate checkOut;
 }

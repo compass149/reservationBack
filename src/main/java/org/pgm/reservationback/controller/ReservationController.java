@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @Log4j2
 @RestController
 @RequiredArgsConstructor
@@ -31,5 +33,21 @@ public class ReservationController {
                                                             UserPrinciple userPrinciple){
         System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"+userPrinciple.getUser());
         return ResponseEntity.ok(reservationService.findReservationItemsOfUser(userPrinciple.getUsername()));
+    }
+
+    @GetMapping("/availability")
+    public ResponseEntity<Boolean> checkRoomAvailability(
+            @RequestParam Long roomId,
+            @RequestParam String checkIn,
+            @RequestParam String checkOut
+    ) {
+        log.info("Checking availability for Room ID: {} from {} to {}", roomId, checkIn, checkOut);
+
+        // 문자열 날짜를 LocalDate로 변환
+        LocalDate checkInDate = LocalDate.parse(checkIn);
+        LocalDate checkOutDate = LocalDate.parse(checkOut);
+
+        boolean isAvailable = reservationService.isRoomAvailable(roomId, checkInDate, checkOutDate);
+        return ResponseEntity.ok(isAvailable);
     }
 }
