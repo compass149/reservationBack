@@ -28,17 +28,22 @@ public class ReservationServiceImpl implements ReservationService {
     private final RoomRepository roomRepository;
 
     @Override
-    public Reservation saveReservation(ReservationDTO reservationDTO) {
+    public ReservationDTO saveReservation(ReservationDTO reservationDTO) {
         Long roomId = reservationDTO.getRoomId();
         LocalDate checkIn = reservationDTO.getCheckIn();
         LocalDate checkOut = reservationDTO.getCheckOut();
 
+        // 상태가 null이면 "PENDING"으로 설정
+        if (reservationDTO.getStatus() == null) {
+            reservationDTO.setStatus(Reservation.Status.대기);
+        }
 
         // 예약 저장
         Reservation reservation = Reservation.builder()
                 .totalUser(reservationDTO.getTotalUser())
                 .checkIn(checkIn)
                 .checkOut(checkOut)
+                .status(reservationDTO.getStatus()) // status 값 추가
                 .build();
 
         User user = userRepository.findByUsername(reservationDTO.getUsername());
@@ -47,7 +52,11 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setUser(user);
         reservation.setRooms(room);
         reservation.setCreatedAt(LocalDateTime.now());
-        return reservationRepository.save(reservation);
+
+        Reservation savedReservation = reservationRepository.save(reservation);
+
+        // 예약 저장 후 Reservation 객체를 ReservationDTO로 변환하여 반환
+        return convertToDTO(savedReservation);
     }
 
     @Override
@@ -62,6 +71,18 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public void deleteReservation(Long id) {
+    }
 
+    // Reservation -> ReservationDTO 변환
+    private ReservationDTO convertToDTO(Reservation reservation) {
+        ReservationDTO reservationDTO = new ReservationDTO();
+        reservationDTO.setId(reservation.getRsvId());
+        reservationDTO.setRoomId(reservation.getRooms().getId());
+        reservationDTO.setCheckIn(reservation.getCheckIn());
+        reservationDTO.setCheckOut(reservation.getCheckOut());
+        reservationDTO.setTotalUser(reservation.getTotalUser());
+        reservationDTO.setUsername(reservation.getUser().getUsername());
+        reservationDTO.setStatus(reservation.getStatus()); // status 값도 추가
+        return reservationDTO;
     }
 }

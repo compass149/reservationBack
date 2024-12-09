@@ -28,7 +28,7 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
 
     @Bean
-    public JwtAuthorizationFilter jwtAuthorizationFilter(){
+    public JwtAuthorizationFilter jwtAuthorizationFilter() {
         return new JwtAuthorizationFilter();
     }
 
@@ -36,22 +36,23 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(httpSecurityCorsConfigurer -> corsConfigurationsource())
-                .sessionManagement((session)->session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests((authz)->authz
+                .cors(cors -> cors.configurationSource(corsConfigurationsource())) // CORS 설정
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 정책 설정
+                .authorizeHttpRequests(authz -> authz // 변경된 부분
                         .requestMatchers("/api/authentication/**").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/api/room/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/room/**").permitAll()
                         .requestMatchers("/api/room/**").hasRole(Role.ADMIN.name())
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+
     @Bean
-    CorsConfigurationSource corsConfigurationsource() {
+    public CorsConfigurationSource corsConfigurationsource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -64,5 +65,4 @@ public class SecurityConfig {
             AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-
 }

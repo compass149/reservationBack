@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.pgm.reservationback.model.Reservation;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,4 +33,6 @@ public class ReservationDTO {
 
     /** 체크아웃 날짜 */
     private LocalDate checkOut;
+
+    private Reservation.Status status;
 }
