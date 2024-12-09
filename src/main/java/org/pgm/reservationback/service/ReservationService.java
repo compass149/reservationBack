@@ -20,6 +20,4 @@ public interface ReservationService {
     // 예약 삭제
     void deleteReservation(Long id);
 
-    // 특정 날짜 범위에서 방 예약 가능 여부 확인
-    boolean isRoomAvailable(Long roomId, LocalDate checkIn, LocalDate checkOut);
 }

@@ -29,7 +29,7 @@ public class Reservation {
 
     /** 예약된 방 **/
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id", referencedColumnName = "rid", nullable = false)
+    @JoinColumn(name = "room_id", referencedColumnName = "id", nullable = false)
     private Rooms rooms;
     /**사람 수*/
     @Column(nullable = false)

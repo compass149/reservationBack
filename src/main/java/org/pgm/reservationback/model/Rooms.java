@@ -19,7 +19,7 @@ public class Rooms {
     /** 방 고유 ID (PK) **/
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long rId;
+    private Long id;
 
     /** 방 이름 **/
     @Column(name = "room_name", nullable = false, length = 100)

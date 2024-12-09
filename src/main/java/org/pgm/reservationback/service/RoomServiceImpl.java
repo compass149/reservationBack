@@ -20,11 +20,19 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public RoomDTO saveRoom(RoomDTO roomDTO) {
         Rooms room = dtoToEntity(roomDTO);
-        room.setCreatedAt(LocalDateTime.now());
+
+        if (room.getId() != null && roomRepository.existsById(room.getId())) {
+            // 수정 작업: 기존 생성일 유지
+            Rooms existingRoom = roomRepository.findById(room.getId()).orElseThrow();
+            room.setCreatedAt(existingRoom.getCreatedAt());
+        } else {
+            // 새로운 방 추가: 현재 시간을 생성일로 설정
+            room.setCreatedAt(LocalDateTime.now());
+        }
+
         Rooms savedRoom = roomRepository.save(room);
         return entityToDto(savedRoom);
     }
-
     @Override
     public void deleteRoom(Long id) {
         roomRepository.deleteById(id);

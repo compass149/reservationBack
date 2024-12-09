@@ -12,7 +12,7 @@ public interface RoomService {
     
     default Rooms dtoToEntity(RoomDTO roomDTO) {
         Rooms rooms = Rooms.builder()
-                .rId(roomDTO.getId())
+                .id(roomDTO.getId())
                 .roomName(roomDTO.getName())
                 .capacity(roomDTO.getCapacity())
                 .pricePerNight(roomDTO.getPrice())
@@ -23,7 +23,7 @@ public interface RoomService {
     
     default RoomDTO entityToDto(Rooms rooms) {
         RoomDTO roomDTO = RoomDTO.builder()
-                .id(rooms.getRId())
+                .id(rooms.getId())
                 .name(rooms.getRoomName())
                 .price(rooms.getPricePerNight())
                 .capacity(rooms.getCapacity())
