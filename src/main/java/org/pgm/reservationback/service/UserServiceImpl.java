@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
     public User saveUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(Role.USER);
-        user.setCreateTime(LocalDateTime.now());
+        user.setCreatedAt(LocalDateTime.now());
         return userRepository.save(user); //저장한 user 전체를 받을 것임
     }
 

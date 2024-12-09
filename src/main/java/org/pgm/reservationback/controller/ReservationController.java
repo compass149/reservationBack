@@ -4,12 +4,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.pgm.reservationback.dto.ReservationDTO;
 import org.pgm.reservationback.model.Reservation;
+import org.pgm.reservationback.model.User;
+import org.pgm.reservationback.repository.projection.ReservationItem;
 import org.pgm.reservationback.security.UserPrinciple;
 import org.pgm.reservationback.service.ReservationService;
+import org.pgm.reservationback.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Log4j2
 @RestController
@@ -19,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final UserService userService;
 
     @PostMapping
     public ResponseEntity<Object> saveReservation(@RequestBody ReservationDTO reservationDTO,
@@ -44,10 +50,13 @@ public class ReservationController {
     public ResponseEntity<Object> getAllReservationsOfUser(@AuthenticationPrincipal UserPrinciple userPrinciple) {
         log.info("사용자 예약 목록 요청: 사용자 - {}", userPrinciple.getUsername());
         try {
-            return ResponseEntity.ok(reservationService.findReservationItemsOfUser(userPrinciple.getUsername()));
+            // reservationService.findReservationItemsOfUser(username) 호출
+            List<ReservationItem> items = reservationService.findReservationItemsOfUser(userPrinciple.getUsername());
+            return ResponseEntity.ok(items);
         } catch (Exception e) {
             log.error("사용자 예약 목록 조회 오류: ", e);
             return new ResponseEntity<>("예약 목록 조회 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 }

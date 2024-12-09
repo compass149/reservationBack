@@ -14,18 +14,18 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReservationDTO {
-    private Long id;
+    private Long rsvId;
 
     /** 예약한 사용자 */
     private String username;
 
-    /** 방 ID (자동으로 선택됨) */
-    private Long roomId;
+    /** 방 이름 */
+    private Long roomId; // roomName 대신 roomId를 사용
 
     /** 예약 인원 수 */
     private Integer totalUser;
 
-    /** 예약 생성 시간 */
+    /** 예약 생성 시간 (필요하다면 유지, 필요없다면 제거) */
     private LocalDateTime reserveTime;
 
     /** 체크인 날짜 */

@@ -41,15 +41,19 @@ public class User {
     private String email;
 
     @Column(name = "createdAt", nullable = false)
-    private LocalDateTime createTime;
+    private LocalDateTime createdAt;
 
 
     @Column(name = "updatedAt", nullable = false)
     private LocalDateTime updatedAt;
+
     @PrePersist
     public void prePersist() {
-        if (updatedAt == null) {
-            updatedAt = LocalDateTime.now(); // 현재 날짜와 시간으로 설정
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+        if (this.updatedAt == null) {
+            this.updatedAt = LocalDateTime.now();
         }
     }
 

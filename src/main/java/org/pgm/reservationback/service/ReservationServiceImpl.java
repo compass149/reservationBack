@@ -29,7 +29,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public ReservationDTO saveReservation(ReservationDTO reservationDTO) {
-        Long roomId = reservationDTO.getRoomId();
+        Long roomId = Long.valueOf(reservationDTO.getRoomId());
         LocalDate checkIn = reservationDTO.getCheckIn();
         LocalDate checkOut = reservationDTO.getCheckOut();
 
@@ -61,7 +61,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public List<ReservationItem> findReservationItemsOfUser(String username) {
-        return List.of();
+        return reservationRepository.findAllReservationsOfUser(username);
     }
 
     @Override
@@ -76,13 +76,14 @@ public class ReservationServiceImpl implements ReservationService {
     // Reservation -> ReservationDTO 변환
     private ReservationDTO convertToDTO(Reservation reservation) {
         ReservationDTO reservationDTO = new ReservationDTO();
-        reservationDTO.setId(reservation.getRsvId());
+        reservationDTO.setRsvId(reservation.getRsvId());
+        // reservation.getRoomId()가 아니라, reservation.getRooms().getId()로 수정
         reservationDTO.setRoomId(reservation.getRooms().getId());
         reservationDTO.setCheckIn(reservation.getCheckIn());
         reservationDTO.setCheckOut(reservation.getCheckOut());
         reservationDTO.setTotalUser(reservation.getTotalUser());
         reservationDTO.setUsername(reservation.getUser().getUsername());
-        reservationDTO.setStatus(reservation.getStatus()); // status 값도 추가
+        reservationDTO.setStatus(reservation.getStatus());
         return reservationDTO;
     }
 }

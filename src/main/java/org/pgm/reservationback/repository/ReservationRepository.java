@@ -12,10 +12,11 @@ import java.util.List;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
     // 사용자별 예약 목록 조회
-    @Query("SELECT rooms.roomName as name, rsv.totalUser as quantity, rsv.createdAt as reservationTime " +
+    @Query("SELECT rsv.rsvId as rsvId, rooms.roomName as roomName, rsv.checkIn as checkIn, rsv.checkOut as checkOut, rsv.status as status " +
             "FROM Reservation rsv " +
             "LEFT JOIN Rooms rooms ON rooms.id = rsv.rooms.id " +
-            "WHERE rsv.user.username = :username")
+            "JOIN rsv.user user " +
+            "WHERE user.username = :username")
     List<ReservationItem> findAllReservationsOfUser(@Param("username") String username);
 
     // 특정 날짜 범위에서 방의 예약 충돌 여부 확인
