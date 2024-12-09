@@ -31,11 +31,11 @@ public class Rooms {
 
     /** 수용 인원 **/
     @Column(name = "capacity", nullable = false)
-    private int capacity;
+    private Long capacity;
 
     /** 가격 **/
     @Column(nullable = false)
-    private Double pricePerNight;
+    private Long pricePerNight;
 
     /** 방 생성 시간 **/
     @Column(name = "created_at", nullable = false, updatable = false)

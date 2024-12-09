@@ -15,7 +15,7 @@ public class RoomDTO {
     private Long id;
     private String name;
     private String description;
-    private int capacity;
-    private Double price;
+    private Long capacity;
+    private Long price;
     private LocalDateTime createdAt;
 }
