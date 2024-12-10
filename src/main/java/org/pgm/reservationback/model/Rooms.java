@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
@@ -16,49 +18,50 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Rooms {
 
-    /** 방 고유 ID (PK) **/
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** 방 이름 **/
     @Column(name = "room_name", nullable = false, length = 100)
     private String roomName;
 
-    /** 방 설명 **/
     @Column(name = "description", length = 255)
     private String description;
 
-    /** 수용 인원 **/
     @Column(name = "capacity", nullable = false)
     private Long capacity;
 
-    /** 가격 **/
     @Column(nullable = false)
     private Long pricePerNight;
 
-    /** 방 생성 시간 **/
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    /** 방 수정 시간 **/
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    /** 방 타입 ENUM **/
-    public enum RoomType {
-        MALE, FEMALE
-    }
+    @Builder.Default
+    // RoomImages와 1:N 관계
+    @OneToMany(mappedBy = "rooms", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<RoomImages> images = new ArrayList<>();
 
-    /** 엔티티 저장 전 생성 시간 설정 **/
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
 
-    /** 엔티티 수정 전 수정 시간 갱신 **/
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
+    }
+
+    // 이미지 추가 메서드
+    public void addImage(RoomImages image) {
+        images.add(image);
+        image.setRooms(this);
+    }
+
+    public void clearImages() {
+        images.clear();
     }
 }

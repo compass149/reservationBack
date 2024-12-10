@@ -38,6 +38,8 @@ public class Reservation {
     /** 예약 상태 **/
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
+
     private Status status = Status.대기;
 
     /** 체크인 날짜 **/

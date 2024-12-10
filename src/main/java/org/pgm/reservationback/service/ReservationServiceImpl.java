@@ -12,7 +12,9 @@ import org.pgm.reservationback.repository.UserRepository;
 import org.pgm.reservationback.repository.projection.ReservationItem;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,6 +28,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
+    private final FileService fileService;
 
     @Override
     public ReservationDTO saveReservation(ReservationDTO reservationDTO) {
@@ -69,10 +72,6 @@ public class ReservationServiceImpl implements ReservationService {
         return List.of();
     }
 
-    @Override
-    public void deleteReservation(Long id) {
-    }
-
     // Reservation -> ReservationDTO 변환
     private ReservationDTO convertToDTO(Reservation reservation) {
         ReservationDTO reservationDTO = new ReservationDTO();
@@ -85,5 +84,21 @@ public class ReservationServiceImpl implements ReservationService {
         reservationDTO.setUsername(reservation.getUser().getUsername());
         reservationDTO.setStatus(reservation.getStatus());
         return reservationDTO;
+    }
+
+    public void cancelReservation(Long rsvId, String username) {
+        Reservation reservation = reservationRepository.findById(rsvId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 예약을 찾을 수 없습니다."));
+
+        // 예약의 사용자명과 현재 요청한 사용자의 username이 일치하거나,
+        // 관리자 권한이면 취소를 허용하는 식의 로직을 추가할 수 있습니다.
+        if (!reservation.getUser().getUsername().equals(username)) {
+            throw new SecurityException("해당 예약을 취소할 권한이 없습니다.");
+        }
+
+        // 취소 로직 예: 상태를 '취소'로 변경하거나, 실제로 DB에서 삭제할 수도 있음
+        // 여기서는 상태 변경으로 가정
+        reservation.setStatus(Reservation.Status.취소);
+        reservationRepository.save(reservation);
     }
 }

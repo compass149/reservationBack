@@ -59,4 +59,17 @@ public class ReservationController {
         }
     }
 
+    @DeleteMapping("/{rsvId}")
+    public ResponseEntity<?> cancelReservation(@PathVariable Long rsvId, @AuthenticationPrincipal UserPrinciple userPrinciple) {
+        log.info("예약 취소 요청: 사용자 - {}, 예약번호 - {}", userPrinciple.getUsername(), rsvId);
+        try {
+            reservationService.cancelReservation(rsvId, userPrinciple.getUsername());
+            return ResponseEntity.ok("예약이 취소되었습니다.");
+        } catch (Exception e) {
+            log.error("예약 취소 오류: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예약 취소 중 오류가 발생했습니다.");
+        }
+    }
+
+
 }

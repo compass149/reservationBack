@@ -3,6 +3,7 @@ package org.pgm.reservationback.service;
 import org.pgm.reservationback.dto.ReservationDTO;
 import org.pgm.reservationback.model.Reservation;
 import org.pgm.reservationback.repository.projection.ReservationItem;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -17,5 +18,5 @@ public interface ReservationService {
     List<Reservation> findAllReservations();
 
     // 예약 삭제
-    void deleteReservation(Long id);
+    void cancelReservation(Long rsvId, String username);
 }
