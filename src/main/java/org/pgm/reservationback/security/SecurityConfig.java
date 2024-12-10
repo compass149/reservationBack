@@ -39,12 +39,14 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationsource())) // CORS 설정
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 정책 설정
-                .authorizeHttpRequests(authz -> authz // 변경된 부분
+                .authorizeHttpRequests(authz -> authz
+                        .requestMatchers("/upload/uploads/**").permitAll()
                         .requestMatchers("/api/authentication/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/room/**").permitAll()
                         .requestMatchers("/api/room/**").hasRole(Role.ADMIN.name())
                         .anyRequest().authenticated()
                 )
+
                 .addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
@@ -53,8 +55,10 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationsource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowedMethods(Arrays.asList("*"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+        configuration.addExposedHeader("Content-Disposition");
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

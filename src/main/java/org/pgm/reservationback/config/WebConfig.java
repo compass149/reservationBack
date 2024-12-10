@@ -13,6 +13,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // C:/Project/KDigital/reservationBack/uploads 가 실제 저장 경로라고 가정할 때
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:uploads/");
+               // .addResourceLocations("file:uploads/");
+                .addResourceLocations("file:///C:/upload/uploads/");
     }
 }
