@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ReservationDTO {
     private Long rsvId;
-
+    private RoomDTO room;
     /** 예약한 사용자 */
     private String username;
 
