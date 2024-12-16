@@ -15,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Log4j2
 @RestController
@@ -44,6 +45,17 @@ public class ReservationController {
             log.error("예약 저장 오류: ", e);
             return new ResponseEntity<>("예약 저장 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PostMapping("/ready")
+    public ResponseEntity<Map<String, String>> readyPayment(@RequestBody ReservationRequest request) {
+        // ReservationRequest DTO를 사용하여 예약 처리
+        Reservation reservation = reservationService.createReservation(request);
+
+        // 결제 준비 로직 수행 (KakaoPayService와 연동)
+        Map<String, String> response = reservationService.preparePayment(reservation);
+
+        return ResponseEntity.ok(response); // next_redirect_pc_url 등 반환
     }
 
     @GetMapping
