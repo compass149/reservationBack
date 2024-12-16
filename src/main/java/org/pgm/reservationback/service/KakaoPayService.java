@@ -40,7 +40,7 @@ public class KakaoPayService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public Map<String, String> kakaoPayReady(String orderId, String userId, String itemName, int quantity, int totalAmount) {
+    public Map<String, String> kakaoPayReady(String rsvId, String userId, String itemName, int quantity, int totalAmount) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "KakaoAK " + adminKey);
@@ -48,7 +48,7 @@ public class KakaoPayService {
 
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
             params.add("cid", cid);
-            params.add("partner_order_id", orderId);
+            params.add("partner_order_id", rsvId);
             params.add("partner_user_id", userId);
             params.add("item_name", itemName);
             params.add("quantity", String.valueOf(quantity));
@@ -72,7 +72,7 @@ public class KakaoPayService {
         }
     }
 
-    public Map<String, Object> kakaoPayApprove(String orderId, String userId, String tid, String pgToken) {
+    public Map<String, Object> kakaoPayApprove(String rsvId, String userId, String tid, String pgToken) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "KakaoAK " + adminKey);
@@ -81,7 +81,7 @@ public class KakaoPayService {
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
             params.add("cid", cid);
             params.add("tid", tid);
-            params.add("partner_order_id", orderId);
+            params.add("partner_order_id", rsvId);
             params.add("partner_user_id", userId);
             params.add("pg_token", pgToken);
 

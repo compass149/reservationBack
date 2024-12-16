@@ -17,13 +17,13 @@ public class PaymentController {
     private final KakaoPayService kakaoPayService;
 
     @PostMapping("/ready")
-    public ResponseEntity<Object> kakaoPayReady(@RequestParam String orderId,
+    public ResponseEntity<Object> kakaoPayReady(@RequestParam String rsvId,
                                                 @RequestParam String userId,
                                                 @RequestParam String itemName,
                                                 @RequestParam Integer quantity,
                                                 @RequestParam Integer totalAmount) {
         try {
-            Map<String, String> response = kakaoPayService.kakaoPayReady(orderId, userId, itemName, quantity, totalAmount);
+            Map<String, String> response = kakaoPayService.kakaoPayReady(rsvId, userId, itemName, quantity, totalAmount);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("결제 준비 중 오류 발생: {}", e.getMessage());
@@ -33,11 +33,11 @@ public class PaymentController {
 
     @GetMapping("/success")
     public ResponseEntity<Object> kakaoPaySuccess(@RequestParam String pgToken,
-                                                  @RequestParam String orderId,
+                                                  @RequestParam String rsvId,
                                                   @RequestParam String userId,
                                                   @RequestParam String tid) {
         try {
-            Map<String, Object> response = kakaoPayService.kakaoPayApprove(orderId, userId, tid, pgToken);
+            Map<String, Object> response = kakaoPayService.kakaoPayApprove(rsvId, userId, tid, pgToken);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("카카오페이 결제 승인 중 오류 발생: {}", e.getMessage());

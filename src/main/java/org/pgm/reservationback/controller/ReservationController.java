@@ -3,6 +3,7 @@ package org.pgm.reservationback.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.pgm.reservationback.dto.ReservationDTO;
+import org.pgm.reservationback.dto.ReservationRequestDTO;
 import org.pgm.reservationback.model.Reservation;
 import org.pgm.reservationback.model.User;
 import org.pgm.reservationback.repository.projection.ReservationItem;
@@ -48,7 +49,7 @@ public class ReservationController {
     }
 
     @PostMapping("/ready")
-    public ResponseEntity<Map<String, String>> readyPayment(@RequestBody ReservationRequest request) {
+    public ResponseEntity<Map<String, String>> readyPayment(@RequestBody ReservationRequestDTO request) {
         // ReservationRequest DTO를 사용하여 예약 처리
         Reservation reservation = reservationService.createReservation(request);
 
