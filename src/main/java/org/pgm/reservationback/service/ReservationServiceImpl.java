@@ -28,6 +28,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
+    private final KakaoPayServiceImpl kakaoPayServiceImpl; // KakaoPayService 주입
     private final KakaoPayService kakaoPayService; // KakaoPayService 주입
 
     @Override
@@ -122,16 +123,16 @@ public class ReservationServiceImpl implements ReservationService {
     public Map<String, String> preparePayment(Reservation reservation) {
         // 결제 준비 로직 수행
         String rsvId = "rsv_" + reservation.getRsvId(); // 예약 ID를 주문 ID로 사용
-        String itemName = reservation.getRooms().getRoomName(); // 방 이름
+        String roomName = reservation.getRooms().getRoomName(); // 방 이름
         int totalAmount = reservation.getTotalUser() * reservation.getRooms().getPricePerNight().intValue(); // 총 금액
 
         // KakaoPayService를 호출하여 결제 준비 수행
-        Map<String, String> paymentInfo = kakaoPayService.kakaoPayReady(
+        Map<String, String> paymentInfo = kakaoPayServiceImpl.kakaoPayReady(
                 rsvId,
                 reservation.getUser().getUsername(), // 사용자 이름
-                itemName,
-                reservation.getTotalUser(),
-                totalAmount
+                roomName,
+                reservation.getTotalUser(), // 사용자 수량 (int)
+                totalAmount // 총 금액 (int)
         );
 
         // 결제 정보 반환
