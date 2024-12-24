@@ -3,6 +3,7 @@ package org.pgm.reservationback.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.pgm.reservationback.dto.ReservationDTO;
+import org.pgm.reservationback.dto.ReservationRequestDTO;
 import org.pgm.reservationback.model.Reservation;
 import org.pgm.reservationback.model.Rooms;
 import org.pgm.reservationback.model.User;
@@ -12,12 +13,11 @@ import org.pgm.reservationback.repository.UserRepository;
 import org.pgm.reservationback.repository.projection.ReservationItem;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -28,7 +28,8 @@ public class ReservationServiceImpl implements ReservationService {
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
-    private final FileService fileService;
+    private final KakaoPayServiceImpl kakaoPayServiceImpl; // KakaoPayService 주입
+    private final KakaoPayService kakaoPayService; // KakaoPayService 주입
 
     @Override
     public ReservationDTO saveReservation(ReservationDTO reservationDTO) {
@@ -100,5 +101,44 @@ public class ReservationServiceImpl implements ReservationService {
         // 여기서는 상태 변경으로 가정
         reservation.setStatus(Reservation.Status.취소);
         reservationRepository.save(reservation);
+    }
+
+    @Override
+    public Reservation createReservation(ReservationRequestDTO requestDTO) {
+        // ReservationRequestDTO를 Reservation 엔티티로 변환
+        Reservation reservation = Reservation.builder()
+                .rooms(requestDTO.getRoom()) // Rooms 엔티티
+                .user(requestDTO.getUser()) // User 엔티티
+                .totalUser(requestDTO.getTotalUser())
+                .checkIn(requestDTO.getCheckIn())
+                .checkOut(requestDTO.getCheckOut())
+                .status(Reservation.Status.대기)
+                .build();
+
+        // DB에 저장
+        return reservationRepository.save(reservation);
+    }
+
+    @Override
+    public Map<String, String> preparePayment(Reservation reservation) {
+        // 결제 준비 로직 수행
+        String rsvId = "rsv_" + reservation.getRsvId(); // 예약 ID를 주문 ID로 사용
+        String roomName = reservation.getRooms().getRoomName(); // 방 이름
+        int totalAmount = reservation.getTotalUser() * reservation.getRooms().getPricePerNight().intValue(); // 총 금액
+
+        // KakaoPayService를 호출하여 결제 준비 수행
+        Map<String, String> paymentInfo = kakaoPayServiceImpl.kakaoPayReady(
+                rsvId,
+                reservation.getUser().getUsername(), // 사용자 이름
+                roomName,
+                reservation.getTotalUser(), // 사용자 수량 (int)
+                totalAmount // 총 금액 (int)
+        );
+
+        // 결제 정보 반환
+        Map<String, String> response = new HashMap<>();
+        response.put("next_redirect_pc_url", paymentInfo.get("next_redirect_pc_url")); // 결제 URL
+        response.put("tid", paymentInfo.get("tid")); // 거래 ID
+        return response;
     }
 }

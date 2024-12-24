@@ -44,6 +44,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/authentication/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/room/**").permitAll()
                         .requestMatchers("/api/room/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers("/api/payment/ready", "/api/payment/cancel", "/api/payment/fail").permitAll() // 엔드포인트 허용
                         .anyRequest().authenticated()
                 )
 
