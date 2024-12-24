@@ -28,7 +28,6 @@ public class ReservationServiceImpl implements ReservationService {
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
-    private final KakaoPayServiceImpl kakaoPayServiceImpl; // KakaoPayService 주입
     private final KakaoPayService kakaoPayService; // KakaoPayService 주입
 
     @Override
@@ -121,24 +120,24 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public Map<String, String> preparePayment(Reservation reservation) {
-        // 결제 준비 로직 수행
-        String rsvId = "rsv_" + reservation.getRsvId(); // 예약 ID를 주문 ID로 사용
-        String roomName = reservation.getRooms().getRoomName(); // 방 이름
-        int totalAmount = reservation.getTotalUser() * reservation.getRooms().getPricePerNight().intValue(); // 총 금액
+        // 결제 준비 로직
+        String rsvId = "rsv_" + reservation.getRsvId();
+        String roomName = reservation.getRooms().getRoomName();
+        int totalAmount = reservation.getTotalUser() * reservation.getRooms().getPricePerNight().intValue();
 
-        // KakaoPayService를 호출하여 결제 준비 수행
-        Map<String, String> paymentInfo = kakaoPayServiceImpl.kakaoPayReady(
+        // ▲ 이제 kakaoPayService 의 kakaoPayReady()를 호출
+        Map<String, String> paymentInfo = kakaoPayService.kakaoPayReady(
                 rsvId,
-                reservation.getUser().getUsername(), // 사용자 이름
+                reservation.getUser().getUsername(),
                 roomName,
-                reservation.getTotalUser(), // 사용자 수량 (int)
-                totalAmount // 총 금액 (int)
+                reservation.getTotalUser(),
+                totalAmount
         );
 
-        // 결제 정보 반환
+        // 필요한 정보 리턴
         Map<String, String> response = new HashMap<>();
-        response.put("next_redirect_pc_url", paymentInfo.get("next_redirect_pc_url")); // 결제 URL
-        response.put("tid", paymentInfo.get("tid")); // 거래 ID
+        response.put("next_redirect_pc_url", paymentInfo.get("next_redirect_pc_url"));
+        response.put("tid", paymentInfo.get("tid"));
         return response;
     }
 }

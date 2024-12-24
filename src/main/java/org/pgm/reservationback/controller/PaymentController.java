@@ -3,6 +3,7 @@ package org.pgm.reservationback.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pgm.reservationback.model.ReadyResponse;
+import org.pgm.reservationback.service.KakaoPayService;
 import org.pgm.reservationback.service.KakaoPayServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,12 +14,15 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/payment")
+@CrossOrigin(origins = "http://localhost:3000")
+
 @Slf4j
 
 public class PaymentController {
 
     @Autowired
     private KakaoPayServiceImpl paymentService;
+    private final KakaoPayService kakaoPayService;
 
     /**
      * 기본 엔드포인트: API 상태 확인용
@@ -36,29 +40,22 @@ public class PaymentController {
      * @param openType 결제 화면 종류
      * @return 결제 준비 결과 (리디렉션 URL 포함)
      */
-    @PostMapping("/ready")
-    public ResponseEntity<Object> ready(@PathVariable("agent") String agent, @PathVariable("openType") String openType) {
+    @PostMapping("/ready/{agent}/{openType}")
+    public ResponseEntity<Object> ready(
+            @PathVariable("agent") String agent,
+            @PathVariable("openType") String openType) {
         try {
             System.out.println("[INFO] 결제 준비 요청 - Agent: " + agent + ", OpenType: " + openType);
-            ReadyResponse readyResponse = paymentService.ready(agent, openType);
+            ReadyResponse readyResponse = kakaoPayService.ready(agent, openType);
 
-            // 모바일 환경에서 리디렉션 URL 반환
-            if (agent.equals("mobile")) {
-                System.out.println("[INFO] 모바일 환경 리디렉션 URL 반환");
+            if ("mobile".equals(agent)) {
                 return ResponseEntity.ok().body(Map.of("redirectUrl", readyResponse.getNext_redirect_mobile_url()));
-            }
-
-            // 앱 환경에서 웹뷰 URL 반환
-            if (agent.equals("app")) {
-                System.out.println("[INFO] 앱 환경 웹뷰 URL 반환");
+            } else if ("app".equals(agent)) {
                 return ResponseEntity.ok().body(Map.of("webviewUrl", "app://webview?url=" + readyResponse.getNext_redirect_app_url()));
+            } else {
+                return ResponseEntity.ok().body(readyResponse); // PC의 경우
             }
-
-            // PC 환경에서 전체 응답 반환
-            System.out.println("[INFO] PC 환경 응답 반환");
-            return ResponseEntity.ok().body(readyResponse);
         } catch (Exception e) {
-            System.err.println("[ERROR] 결제 준비 중 오류 발생: " + e.getMessage());
             return ResponseEntity.status(500).body("결제 준비 중 오류가 발생했습니다: " + e.getMessage());
         }
     }

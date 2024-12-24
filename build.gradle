@@ -47,6 +47,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-json'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
 
+    implementation 'commons-codec:commons-codec:1.10'
 }
 
 tasks.named('test') {

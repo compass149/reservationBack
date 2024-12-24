@@ -2,6 +2,8 @@ package org.pgm.reservationback.service;
 
 import org.pgm.reservationback.model.ReadyResponse;
 
+import java.util.Map;
+
 public interface KakaoPayService {
 
 
@@ -19,6 +21,8 @@ public interface KakaoPayService {
          * @return 승인 결과 문자열
          */
         String approve(String pgToken);
-    }
+
+    Map<String, String> kakaoPayReady(String rsvId, String username, String itemName, int quantity, int totalAmount);
+}
 
 
