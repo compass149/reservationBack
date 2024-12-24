@@ -1,23 +1,25 @@
 package org.pgm.reservationback.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import java.net.URI;
-import java.util.HashMap;
+
 import java.util.Map;
 
+import static javax.crypto.Cipher.SECRET_KEY;
+
 @Service
+@RequiredArgsConstructor
 public class KakaoPayService {
 
     @Value("${kakao.pay.admin-key}")
     private String adminKey;
-
-    @Value("${kakao.pay.cid}")
-    private String cid;
 
     @Value("${kakao.pay.ready-url}")
     private String readyUrl;
@@ -25,57 +27,52 @@ public class KakaoPayService {
     @Value("${kakao.pay.approve-url}")
     private String approveUrl;
 
-    @Value("${kakao.pay.approval-url}")
-    private String approvalUrl;
-
-    @Value("${kakao.pay.cancel-url}")
-    private String cancelUrl;
-
-    @Value("${kakao.pay.fail-url}")
-    private String failUrl;
-
-    public Map<String, String> kakaoPayReady(String orderId, String userId, String itemName, int quantity, int totalAmount) {
-        RestTemplate restTemplate = new RestTemplate();
-
+    public Map<String, String> kakaoPayReady(
+            String orderId,
+            String userId,
+            String itemName,
+            int quantity,
+            int totalAmount
+    ) {
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "KakaoAK " + adminKey);
+        headers.add("Authorization", "SECRET_KEY " + SECRET_KEY);
         headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("cid", cid);
-        params.put("partner_order_id", orderId);
-        params.put("partner_user_id", userId);
-        params.put("item_name", itemName);
-        params.put("quantity", quantity);
-        params.put("total_amount", totalAmount);
-        params.put("tax_free_amount", 0);
-        params.put("approval_url", approvalUrl);
-        params.put("cancel_url", cancelUrl);
-        params.put("fail_url", failUrl);
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("cid", "TC0ONETIME");
+        params.add("partner_order_id", orderId);
+        params.add("partner_user_id", userId);
+        params.add("item_name", itemName);
+        params.add("quantity", String.valueOf(quantity));
+        params.add("total_amount", String.valueOf(totalAmount));
+        params.add("tax_free_amount", "0");
+        params.add("approval_url", "http://localhost:3000/payment/success");
+        params.add("cancel_url", "http://localhost:3000/payment/cancel");
+        params.add("fail_url", "http://localhost:3000/payment/fail");
 
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(params, headers);
+        RestTemplate restTemplate = new RestTemplate();
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 
-        Map<String, String> response = restTemplate.postForObject(URI.create(readyUrl), entity, Map.class);
-        return response;
+        ResponseEntity<Map> response = restTemplate.postForEntity(readyUrl, request, Map.class);
+        return response.getBody();
     }
 
-    public Map<String, Object> kakaoPayApprove(String orderId, String userId, String tid, String pgToken) {
-        RestTemplate restTemplate = new RestTemplate();
-
+    public String kakaoPayApprove(String orderId, String userId, String tid, String pgToken) {
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.add("Authorization", "KakaoAK " + adminKey);
+        headers.add("Authorization", "SECRET_KEY " + SECRET_KEY);
+        headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("cid", cid);
-        params.put("tid", tid);
-        params.put("partner_order_id", orderId);
-        params.put("partner_user_id", userId);
-        params.put("pg_token", pgToken);
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("cid", "TC0ONETIME");
+        params.add("tid", tid);
+        params.add("partner_order_id", orderId);
+        params.add("partner_user_id", userId);
+        params.add("pg_token", pgToken);
 
-        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(params, headers);
+        RestTemplate restTemplate = new RestTemplate();
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 
-        Map<String, Object> response = restTemplate.postForObject(URI.create(approveUrl), requestEntity, Map.class);
-        return response;
+        ResponseEntity<String> response = restTemplate.postForEntity(approveUrl, request, String.class);
+        return response.getBody();
     }
 }
