@@ -47,6 +47,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/authentication/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/room/**").permitAll()
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/approve/**").permitAll() // 결제 승인 허용
                         .requestMatchers("/api/payment/ready", "/api/payment/cancel", "/api/payment/fail").permitAll()
 
                         // 관리자 전용 API
