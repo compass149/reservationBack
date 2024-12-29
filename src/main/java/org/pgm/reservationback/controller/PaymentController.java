@@ -2,19 +2,21 @@ package org.pgm.reservationback.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.pgm.reservationback.dto.ApproveResponseDTO;
 import org.pgm.reservationback.model.ReadyResponse;
 import org.pgm.reservationback.service.KakaoPayService;
 import org.pgm.reservationback.service.KakaoPayServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/payment")
+//@RequestMapping("/api/payment")
 @CrossOrigin(origins = "http://localhost:3000")
 
 @Slf4j
@@ -41,7 +43,7 @@ public class PaymentController {
      * @param openType 결제 화면 종류
      * @return 결제 준비 결과 (리디렉션 URL 포함)
      */
-    @PostMapping("/ready/{agent}/{openType}")
+    @PostMapping("/api/payment/ready/{agent}/{openType}")
     public ResponseEntity<Object> ready(
             @PathVariable("agent") String agent,
             @PathVariable("openType") String openType) {
@@ -68,21 +70,17 @@ public class PaymentController {
      * @param pgToken 결제 승인 토큰
      * @return 결제 승인 결과
      */
+    // 변경 후
     @GetMapping("/approve/{agent}/{openType}")
-    public ResponseEntity<Object> approve(
-            @PathVariable String agent,
-            @PathVariable String openType,
-            @RequestParam("pg_token") String pgToken) {
-        try {
-            // KakaoPay 결제 승인 처리
-            String approvalResult = kakaoPayService.approve(pgToken);
-            return ResponseEntity.ok(approvalResult);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("결제 승인 중 오류가 발생했습니다: " + e.getMessage());
-        }
+    public ResponseEntity<ApproveResponseDTO> approve(
+            @PathVariable("agent") String agent,
+            @PathVariable("openType") String openType,
+            @RequestParam("pg_token") String pgToken
+    ) {
+        ApproveResponseDTO approveResponse = kakaoPayService.approve(pgToken);
+        // 승인에 대한 JSON을 그대로 반환
+        return ResponseEntity.ok(approveResponse);
     }
-
     /**
      * 결제 취소 엔드포인트
      * @param agent 사용자 디바이스 정보

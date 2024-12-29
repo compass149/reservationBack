@@ -1,6 +1,7 @@
 package org.pgm.reservationback.service;
 
 import lombok.RequiredArgsConstructor;
+import org.pgm.reservationback.dto.ApproveResponseDTO;
 import org.pgm.reservationback.model.ApproveRequest;
 import org.pgm.reservationback.model.ReadyRequest;
 import org.pgm.reservationback.model.ReadyResponse;
@@ -85,36 +86,43 @@ public class KakaoPayServiceImpl implements KakaoPayService {
      * 결제 승인 (카카오페이 Approve API)
      */
     @Override
-    public String approve(String pgToken) {
+    public ApproveResponseDTO approve(String pgToken) {
         // 1) Request header
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "SECRET_KEY " + kakaopaySecretKey);
+
+        // [중요] 카카오 공식 문서 기준: "KakaoAK" + {ADMIN_KEY} 형태가 일반적입니다.
+        //       ("DEV_SECRET_KEY" "SECRET_KEY" 등은 현재 Kakao Pay에서 권장하지 않음)
+        headers.add("Authorization", "DEV_SECRET_KEY " + kakaopaySecretKey);
+
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         // 2) Request body (ApproveRequest) 구성
         ApproveRequest approveRequest = ApproveRequest.builder()
                 .cid(cid)
-                .tid(tid)
+                .tid(tid)                  // ready에서 저장한 tid
                 .partnerOrderId("1")
                 .partnerUserId("1")
-                .pgToken(pgToken)
+                .pgToken(pgToken)          // 꼭 있어야 함
                 .build();
 
         HttpEntity<ApproveRequest> entityMap = new HttpEntity<>(approveRequest, headers);
 
         // 3) API 호출
         try {
-            ResponseEntity<String> response = new RestTemplate().postForEntity(
+            // 응답을 ApproveResponseDTO로 받아서 바로 매핑
+            ResponseEntity<ApproveResponseDTO> response = new RestTemplate().postForEntity(
                     "https://open-api.kakaopay.com/online/v1/payment/approve",
                     entityMap,
-                    String.class
+                    ApproveResponseDTO.class
             );
 
-            // 4) 승인 결과 반환
+            // 4) 승인 결과를 DTO 형태로 반환
             return response.getBody();
+
         } catch (HttpStatusCodeException ex) {
-            // 에러 시 응답 바디를 반환(또는 예외 던지기)
-            return ex.getResponseBodyAsString();
+            // 필요하다면 오류 내용을 직접 파싱하거나, Runtime 예외로 재포장하여 throw
+            throw new RuntimeException("카카오페이 결제 승인 실패: " + ex.getResponseBodyAsString(), ex);
         }
     }
+
 }
