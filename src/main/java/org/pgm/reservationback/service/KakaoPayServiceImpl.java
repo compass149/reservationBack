@@ -35,13 +35,13 @@ public class KakaoPayServiceImpl implements KakaoPayService {
      * 결제 준비 (카카오페이 Ready API)
      */
     @Override
-    public ReadyResponse ready(String agent, String openType) {
-        // 1) Request header
+    public ReadyResponse ready(String agent, String openType, Long rsvId) {
+        // (1) Request header
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "DEV_SECRET_KEY " + kakaopaySecretKey);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // 2) Request body (ReadyRequest) 구성
+        // (2) Request body 구성
         ReadyRequest readyRequest = ReadyRequest.builder()
                 .cid(cid)
                 .partnerOrderId("1")
@@ -51,14 +51,15 @@ public class KakaoPayServiceImpl implements KakaoPayService {
                 .totalAmount(1100)
                 .taxFreeAmount(0)
                 .vatAmount(100)
-                .approvalUrl(sampleHost + "/approve/" + agent + "/" + openType)
+                // ★ rsvId(= rsvId) 쿼리 파라미터 추가
+                .approvalUrl(sampleHost + "/approve/" + agent + "/" + openType + "?rsvId=" + rsvId)
                 .cancelUrl(sampleHost + "/cancel/" + agent + "/" + openType)
                 .failUrl(sampleHost + "/fail/" + agent + "/" + openType)
                 .build();
 
         HttpEntity<ReadyRequest> entityMap = new HttpEntity<>(readyRequest, headers);
 
-        // 3) API 호출
+        // (3) API 호출
         ResponseEntity<ReadyResponse> response = new RestTemplate().postForEntity(
                 "https://open-api.kakaopay.com/online/v1/payment/ready",
                 entityMap,
@@ -66,7 +67,7 @@ public class KakaoPayServiceImpl implements KakaoPayService {
         );
         ReadyResponse readyResponse = response.getBody();
 
-        // 4) 받은 TID 저장
+        // (4) 발급받은 TID 보관
         this.tid = readyResponse.getTid();
 
         return readyResponse;

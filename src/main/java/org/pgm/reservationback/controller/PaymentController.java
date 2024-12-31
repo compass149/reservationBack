@@ -46,10 +46,15 @@ public class PaymentController {
     @PostMapping("/api/payment/ready/{agent}/{openType}")
     public ResponseEntity<Object> ready(
             @PathVariable("agent") String agent,
-            @PathVariable("openType") String openType) {
+            @PathVariable("openType") String openType,
+            @RequestBody Map<String, Object> requestBody
+    ) {
         try {
+            // requestBody 안에 "reservationId"가 들어있다고 가정:
+            Long rsvId = Long.valueOf(requestBody.get("rsvId").toString());
+
             System.out.println("[INFO] 결제 준비 요청 - Agent: " + agent + ", OpenType: " + openType);
-            ReadyResponse readyResponse = kakaoPayService.ready(agent, openType);
+            ReadyResponse readyResponse = kakaoPayService.ready(agent, openType, rsvId);
 
             if ("mobile".equals(agent)) {
                 return ResponseEntity.ok().body(Map.of("redirectUrl", readyResponse.getNext_redirect_mobile_url()));
@@ -70,17 +75,26 @@ public class PaymentController {
      * @param pgToken 결제 승인 토큰
      * @return 결제 승인 결과
      */
-    // 변경 후
     @GetMapping("/approve/{agent}/{openType}")
     public ResponseEntity<ApproveResponseDTO> approve(
             @PathVariable("agent") String agent,
             @PathVariable("openType") String openType,
-            @RequestParam("pg_token") String pgToken
-    ) {
-        ApproveResponseDTO approveResponse = kakaoPayService.approve(pgToken);
-        // 승인에 대한 JSON을 그대로 반환
-        return ResponseEntity.ok(approveResponse);
+            @RequestParam("pg_token") String pgToken,
+            @RequestParam("rsvId") Long rsvId
+    ){
+        try {
+            // 1) 카카오페이 승인
+            ApproveResponseDTO approveResponse = kakaoPayService.approve(pgToken);
+
+            // 2) 예약 상태 “결제완료”로 갱신
+            // reservationService.updateReservationPaid(rsvId);
+
+            return ResponseEntity.ok(approveResponse);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
+
     /**
      * 결제 취소 엔드포인트
      * @param agent 사용자 디바이스 정보
