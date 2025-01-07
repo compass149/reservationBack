@@ -51,10 +51,10 @@ public class PaymentController {
     ) {
         try {
             // requestBody 안에 "reservationId"가 들어있다고 가정:
-            Long rsvId = Long.valueOf(requestBody.get("rsvId").toString());
+           // Long rsvId = Long.valueOf(requestBody.get("rsvId").toString());
 
             System.out.println("[INFO] 결제 준비 요청 - Agent: " + agent + ", OpenType: " + openType);
-            ReadyResponse readyResponse = kakaoPayService.ready(agent, openType, rsvId);
+            ReadyResponse readyResponse = kakaoPayService.ready(agent, openType);
 
             if ("mobile".equals(agent)) {
                 return ResponseEntity.ok().body(Map.of("redirectUrl", readyResponse.getNext_redirect_mobile_url()));
@@ -79,8 +79,8 @@ public class PaymentController {
     public ResponseEntity<ApproveResponseDTO> approve(
             @PathVariable("agent") String agent,
             @PathVariable("openType") String openType,
-            @RequestParam("pg_token") String pgToken,
-            @RequestParam("rsvId") Long rsvId
+            @RequestParam("pg_token") String pgToken
+            //@RequestParam("rsvId") Long rsvId
     ){
         try {
             // 1) 카카오페이 승인

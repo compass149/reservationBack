@@ -14,7 +14,7 @@ public interface KakaoPayService {
          * @param openType 결제 화면 종류
          * @return ReadyResponse 객체 (결제 준비 결과)
          */
-        ReadyResponse ready(String agent, String openType, Long reservationId);
+        ReadyResponse ready(String agent, String openType);
 
         /**
          * 결제 승인 요청

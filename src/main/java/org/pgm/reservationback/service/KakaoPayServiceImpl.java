@@ -35,7 +35,7 @@ public class KakaoPayServiceImpl implements KakaoPayService {
      * 결제 준비 (카카오페이 Ready API)
      */
     @Override
-    public ReadyResponse ready(String agent, String openType, Long rsvId) {
+    public ReadyResponse ready(String agent, String openType) {
         // (1) Request header
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "DEV_SECRET_KEY " + kakaopaySecretKey);
@@ -52,7 +52,7 @@ public class KakaoPayServiceImpl implements KakaoPayService {
                 .taxFreeAmount(0)
                 .vatAmount(100)
                 // ★ rsvId(= rsvId) 쿼리 파라미터 추가
-                .approvalUrl(sampleHost + "/approve/" + agent + "/" + openType + "?rsvId=" + rsvId)
+                .approvalUrl(sampleHost + "/approve/" + agent + "/" + openType)
                 .cancelUrl(sampleHost + "/cancel/" + agent + "/" + openType)
                 .failUrl(sampleHost + "/fail/" + agent + "/" + openType)
                 .build();
