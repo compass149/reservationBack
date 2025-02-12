@@ -6,6 +6,7 @@ import org.pgm.reservationback.dto.ApproveResponseDTO;
 import org.pgm.reservationback.model.ReadyResponse;
 import org.pgm.reservationback.service.KakaoPayService;
 import org.pgm.reservationback.service.KakaoPayServiceImpl;
+import org.pgm.reservationback.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ public class PaymentController {
     @Autowired
     private KakaoPayServiceImpl paymentService;
     private final KakaoPayService kakaoPayService;
+    private final ReservationService reservationService;
 
     /**
      * 기본 엔드포인트: API 상태 확인용
@@ -87,7 +89,7 @@ public class PaymentController {
             ApproveResponseDTO approveResponse = kakaoPayService.approve(pgToken);
 
             // 2) 예약 상태 “결제완료”로 갱신
-            // reservationService.updateReservationPaid(rsvId);
+            //reservationService.updateReservationPaid(rsvId);
 
             return ResponseEntity.ok(approveResponse);
         } catch (Exception e) {

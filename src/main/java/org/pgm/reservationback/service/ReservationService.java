@@ -16,7 +16,8 @@ public interface ReservationService {
 
     // 모든 예약 조회
     List<Reservation> findAllReservations();
-
+    //예약 상태 갱신
+    void updateReservationPaid(Long rsvId);
     // 예약 삭제
     void cancelReservation(Long rsvId, String username);
 

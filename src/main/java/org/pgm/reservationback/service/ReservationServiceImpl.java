@@ -72,6 +72,20 @@ public class ReservationServiceImpl implements ReservationService {
         return List.of();
     }
 
+    @Override
+    public void updateReservationPaid(Long rsvId) {
+        // 1) 예약 ID로 예약 조회
+        Reservation reservation = reservationRepository.findById(rsvId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 예약을 찾을 수 없습니다."));
+
+        // 2) 예약 상태를 "결제완료"로 변경
+        reservation.setStatus(Reservation.Status.완료);
+
+        // 3) 변경된 예약 상태를 저장
+        reservationRepository.save(reservation);
+    }
+
+
     // Reservation -> ReservationDTO 변환
     private ReservationDTO convertToDTO(Reservation reservation) {
         ReservationDTO reservationDTO = new ReservationDTO();
